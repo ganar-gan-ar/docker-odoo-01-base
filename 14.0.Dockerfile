@@ -1,9 +1,8 @@
-FROM python:3.6-slim-buster AS base
+FROM python:3.8-slim-buster AS base
 
 EXPOSE 8069 8072
 
-ARG GEOIP_UPDATER_VERSION=4.1.5
-ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
+ARG GEOIP_UPDATER_VERSION=4.3.0
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
 ENV DB_FILTER=.* \
@@ -13,22 +12,20 @@ ENV DB_FILTER=.* \
     GEOIP_ACCOUNT_ID="" \
     GEOIP_LICENSE_KEY="" \
     GIT_AUTHOR_NAME=docker-odoo \
-    INITIAL_LANG="es_ES" \
+    INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
     LIST_DB=false \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
     PIP_NO_CACHE_DIR=0 \
-    PTVSD_ARGS="--host 0.0.0.0 --port 6899 --wait --multiprocess" \
-    PTVSD_ENABLE=0 \
     DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
     DEBUGPY_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE=1 \
     UNACCENT=true \
-    WAIT_DB=false \
+    WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
@@ -59,7 +56,6 @@ RUN apt-get -qq update \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
-    && apt-get install -yqq --no-install-recommends \
     && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
@@ -69,7 +65,7 @@ RUN apt-get -qq update \
 
 WORKDIR /opt/odoo
 COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.6/site-packages/doodbalib
+COPY lib/doodbalib /usr/local/lib/python3.8/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -77,7 +73,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.6/site-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python3.8/site-packages/doodbalib \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
     && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
@@ -95,14 +91,15 @@ RUN python -m venv --system-site-packages /qa/venv \
         six \
     && npm install --loglevel error --prefix /qa eslint \
     && deactivate \
-    && mkdir -p /qa/artifacts \
-    && git clone --depth 1 $MQT /qa/mqt
+    && mkdir -p /qa/artifacts
 
 ARG ODOO_SOURCE=OCA/OCB
-ARG ODOO_VERSION=13.0
+ARG ODOO_VERSION=14.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 
 # Install Odoo hard & soft dependencies, and Doodba utilities
+# TODO: Add back pydevd-odoo once
+# https://github.com/trinhanhngoc/pydevd-odoo/issues/3 is fixed
 RUN build_deps=" \
         build-essential \
         libfreetype6-dev \
@@ -129,21 +126,19 @@ RUN build_deps=" \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         'websocket-client~=0.56' \
         astor \
-        git-aggregator \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
-        "pg_activity<2.0.0" \
+        debugpy \
+        geoip2 \
+        git-aggregator \
+        inotify \
+        pg_activity \
         phonenumbers \
         plumbum \
-        ptvsd \
-        debugpy \
-        pydevd-odoo \
         pudb \
         watchdog \
         wdb \
-        geoip2 \
-        inotify \
-    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
@@ -183,20 +178,13 @@ ONBUILD ARG SMTP_USER=false
 ONBUILD ARG SMTP_PASSWORD=false
 ONBUILD ARG SMTP_SSL=false
 ONBUILD ARG EMAIL_FROM=""
-ONBUILD ARG PROXY_MODE=true
+ONBUILD ARG PROXY_MODE=false
 ONBUILD ARG WITHOUT_DEMO=all
 ONBUILD ARG PGUSER=odoo
 ONBUILD ARG PGPASSWORD=odoopassword
 ONBUILD ARG PGHOST=db
 ONBUILD ARG PGPORT=5432
 ONBUILD ARG PGDATABASE=prod
-ONBUILD ARG WORKERS=2
-ONBUILD ARG MAX_CRON_THREADS=1
-ONBUILD ARG DB_MAXCONN=6
-ONBUILD ARG LIMIT_MEMORY_HARD=1395864371
-ONBUILD ARG LIMIT_MEMORY_SOFT=255652815
-ONBUILD ARG LIMIT_TIME_CPU=60
-ONBUILD ARG LIMIT_TIME_REAL=170
 
 # Config variables
 ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
@@ -215,17 +203,7 @@ ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             SMTP_PASSWORD="$SMTP_PASSWORD" \
             SMTP_SSL="$SMTP_SSL" \
             EMAIL_FROM="$EMAIL_FROM" \
-            WITHOUT_DEMO="$WITHOUT_DEMO" \
-            WORKERS="$WORKERS" \
-            MAX_CRON_THREADS="$MAX_CRON_THREADS" \
-            DB_MAXCONN="$DB_MAXCONN" \
-            LIMIT_MEMORY_HARD="$LIMIT_MEMORY_HARD" \
-            LIMIT_MEMORY_SOFT="$LIMIT_MEMORY_SOFT" \
-            LIMIT_TIME_CPU="$LIMIT_TIME_CPU" \
-            LIMIT_TIME_REAL="$LIMIT_TIME_REAL"
-
-
-
+            WITHOUT_DEMO="$WITHOUT_DEMO"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 
