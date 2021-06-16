@@ -62,7 +62,9 @@ jobs:
       - run: poetry run python -m unittest -v tests
       # Push
       - name: push to docker hub
-        if: github.repository == 'ganarganar/docker-odoo-01-base' && github.ref == 'refs/heads/master'
+        if:
+          github.repository == 'ganarganar/docker-odoo-01-base' && github.ref ==
+          'refs/heads/master'
         env:
           REGISTRY_HOST: docker.io
           REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
