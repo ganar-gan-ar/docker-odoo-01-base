@@ -152,7 +152,7 @@ LABEL org.label-schema.schema-version="$VERSION" \
       org.label-schema.license=Apache-2.0 \
       org.label-schema.build-date="$BUILD_DATE" \
       org.label-schema.vcs-ref="$VCS_REF" \
-      org.label-schema.vcs-url="https://github.com/Tecnativa/doodba"
+      org.label-schema.vcs-url="https://github.com/ganarganar/docker-odoo-01-base"
 
 # Onbuild version, with all the magic
 FROM base AS onbuild

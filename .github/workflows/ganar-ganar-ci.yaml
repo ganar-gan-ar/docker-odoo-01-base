@@ -37,13 +37,11 @@ jobs:
         odoo_version:
           - "14.0"
           - "13.0"
-          - "12.0"
-          - "11.0"
     env:
-      # Indicates what's the equivalent to tecnativa/doodba:latest image
+      # Indicates what's the equivalent to ganarganar/docker-odoo-01-base:latest image
       LATEST_RELEASE: "14.0"
       # Variables found by default in Docker Hub builder
-      DOCKER_REPO: tecnativa/doodba
+      DOCKER_REPO: ganarganar/odoo-01-base
       DOCKER_TAG: ${{ matrix.odoo_version }}
       GIT_SHA1: ${{ github.sha }}
       # Other variables to configure tests and execution environment
@@ -64,7 +62,7 @@ jobs:
       - run: poetry run python -m unittest -v tests
       # Push
       - name: push to docker hub
-        if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
+        if: github.repository == 'ganarganar/docker-odoo-01-base' && github.ref == 'refs/heads/master'
         env:
           REGISTRY_HOST: docker.io
           REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
