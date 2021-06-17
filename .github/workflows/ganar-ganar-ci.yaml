@@ -63,7 +63,7 @@ jobs:
       - name: push to docker hub
         if:
           github.repository == 'ganarganar/docker-odoo-01-base' && github.ref ==
-          'refs/heads/master'
+          'refs/heads/main'
         env:
           REGISTRY_HOST: docker.io
           REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
