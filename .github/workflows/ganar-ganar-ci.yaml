@@ -79,7 +79,7 @@ jobs:
 
       - name: tag the image with a date tag
         run:
-          docker build -f ${{ env.DOCKER_TAG }}.Dockerfile  -t ${{ env.DOCKER_REPO
+          docker build . -f ${{ env.DOCKER_TAG }}.Dockerfile  -t ${{ env.DOCKER_REPO
           }}:${{ env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime
           }}-onbuild .
 
