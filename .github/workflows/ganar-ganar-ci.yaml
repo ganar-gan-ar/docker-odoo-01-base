@@ -81,7 +81,7 @@ jobs:
         run:
           docker build -f ${{ env.DOCKER_TAG }}.Dockerfile  -t ${{ env.DOCKER_REPO
           }}:${{ env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime
-          }}-onbuild
+          }}-onbuild .
 
       - name: push the new tag
         run:
