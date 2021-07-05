@@ -76,8 +76,13 @@ jobs:
         with:
           format: YYYYMMDDHHmm
           utcOffset: "-03:00"
+
       - name: tag the image with a date tag
-        run: docker build -f {{DOCKER_TAG}}.Dockerfile  -t ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime }}
+        run: 
+          docker build -f {{DOCKER_TAG}}.Dockerfile  -t ${{ env.DOCKER_REPO }}:${{ 
+          env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime }}
       
       - name: push the new tag
-        run: docker push ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime }}
+        run: 
+          docker push ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}-${{ 
+          steps.current-time.outputs.formattedTime }}
