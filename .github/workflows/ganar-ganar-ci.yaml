@@ -79,10 +79,15 @@ jobs:
 
       - name: tag the image with a date tag
         run:
-          docker build -f {{DOCKER_TAG}}.Dockerfile  -t ${{ env.DOCKER_REPO }}:${{
-          env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime }}
+          docker build -f ${{ envDOCKER_TAG }}.Dockerfile  -t ${{ env.DOCKER_REPO }}:${{
+          env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime }}-onbuild
 
       - name: push the new tag
         run:
           docker push ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}-${{
-          steps.current-time.outputs.formattedTime }}
+          steps.current-time.outputs.formattedTime }}-onbuild
+
+      - uses: actions/checkout@v2
+        with:
+          repository: ganarganar/docker-odoo-02-odoo
+          path: docker-odoo-02-odoo
