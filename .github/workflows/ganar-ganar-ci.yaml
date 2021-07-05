@@ -91,3 +91,24 @@ jobs:
         with:
           repository: ganarganar/docker-odoo-02-odoo
           path: docker-odoo-02-odoo
+
+      - name: Setup git/github
+        run: |
+          cd docker-odoo-02-odoo
+          echo ${{ secrets.GH_TOKEN }} | gh auth login --with-token
+          git config --local user.name "Ganar Ganar Bot"
+          git config --local user.email "ganarganarbot@gmail.com"
+          git checkout -b bot-pr-${{ steps.current-time.outputs.formattedTime }}
+
+      - name: Updated Dockerfile
+        run: |
+          cd docker-odoo-02-odoo
+          DATE=$(date) TAG="${{ steps.current-time.outputs.formattedTime }}" envsubst < Dockerfile-template > Dockerfile
+
+      - name: Commit changes
+        run: |
+          cd docker-odoo-02-odoo
+          git commit -am "updated Dockerfile"
+          git config --unset-all http.https://github.com/.extraheader
+          git push -u https://${{ secrets.GH_TOKEN }}:${{ secrets.GH_TOKEN }}@github.com/lucciano/docker-odoo-02-odoo.git auto-pr-${{ github.sha }}
+          gh pr create --title "docker-odoo-01-base updated" --body "bot updated from https://github.com/ganarganar/docker-odoo-01-base/" --head bot-pr-${{ steps.current-time.outputs.formattedTime }}
