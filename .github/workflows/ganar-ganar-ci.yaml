@@ -69,7 +69,7 @@ jobs:
           REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_LOGIN }}
         run: poetry run ./hooks/push
-      
+
       - name: Get current date/hour
         uses: 1466587594/get-current-time@v2
         id: current-time
@@ -78,11 +78,11 @@ jobs:
           utcOffset: "-03:00"
 
       - name: tag the image with a date tag
-        run: 
-          docker build -f {{DOCKER_TAG}}.Dockerfile  -t ${{ env.DOCKER_REPO }}:${{ 
+        run:
+          docker build -f {{DOCKER_TAG}}.Dockerfile  -t ${{ env.DOCKER_REPO }}:${{
           env.DOCKER_TAG }}-${{ steps.current-time.outputs.formattedTime }}
-      
+
       - name: push the new tag
-        run: 
-          docker push ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}-${{ 
+        run:
+          docker push ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}-${{
           steps.current-time.outputs.formattedTime }}
