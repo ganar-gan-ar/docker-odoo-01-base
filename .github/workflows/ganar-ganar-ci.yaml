@@ -89,8 +89,9 @@ jobs:
           steps.current-time.outputs.formattedTime }}-onbuild
 
       - name: get docker-odoo-02-odoo source code
-        run: |
-        git clone https://${{ secrets.GH_TOKEN }}:${{ secrets.GH_TOKEN }}@github.com/lucciano/docker-odoo-02-odoo.git
+        run:
+          git clone https://${{ secrets.GH_TOKEN }}:${{ secrets.GH_TOKEN
+          }}@github.com/lucciano/docker-odoo-02-odoo.git
 
       - name: Setup git/github
         run: |
