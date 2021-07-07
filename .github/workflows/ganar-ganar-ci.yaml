@@ -88,11 +88,9 @@ jobs:
           docker push ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}-${{
           steps.current-time.outputs.formattedTime }}-onbuild
 
-      - uses: actions/checkout@v2
-        with:
-          repository: ganarganar/docker-odoo-02-odoo
-          path: docker-odoo-02-odoo
-          ref: "13.0"
+      - name: get docker-odoo-02-odoo source code
+        run: |
+        git clone https://${{ secrets.GH_TOKEN }}:${{ secrets.GH_TOKEN }}@github.com/lucciano/docker-odoo-02-odoo.git
 
       - name: Setup git/github
         run: |
@@ -112,5 +110,5 @@ jobs:
           cd docker-odoo-02-odoo
           git commit -am "updated Dockerfile"
           git config --unset-all http.https://github.com/.extraheader
-          git push -u https://${{ secrets.GH_TOKEN }}:${{ secrets.GH_TOKEN }}@github.com/lucciano/docker-odoo-02-odoo.git auto-pr-${{ github.sha }}
+          git push -u origin auto-pr-${{ github.sha }}
           gh pr create --title "docker-odoo-01-base updated" --body "bot updated from https://github.com/ganarganar/docker-odoo-01-base/" --head bot-pr-${{ steps.current-time.outputs.formattedTime }}
