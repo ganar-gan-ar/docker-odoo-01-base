@@ -92,7 +92,7 @@ jobs:
         with:
           repository: ganarganar/docker-odoo-02-odoo
           path: docker-odoo-02-odoo
-          ref: '13.0'
+          ref: "13.0"
 
       - name: Setup git/github
         run: |
