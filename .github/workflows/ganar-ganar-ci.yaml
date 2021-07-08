@@ -111,5 +111,4 @@ jobs:
         run: |
           cd docker-odoo-02-odoo
           git commit -am "updated Dockerfile"
-          
           git push -u origin bot-pr-${{ steps.current-time.outputs.formattedTime }}
