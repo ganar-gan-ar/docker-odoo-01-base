@@ -104,8 +104,6 @@ jobs:
       - name: Updated Dockerfile
         run: |
           cd docker-odoo-02-odoo
-          pwd
-          ls -las
           DATE=$(date) TAG="${{ steps.current-time.outputs.formattedTime }}" envsubst < Dockerfile-template > Dockerfile
 
       - name: Commit changes
@@ -114,4 +112,4 @@ jobs:
           git commit -am "updated Dockerfile"
           git config --unset-all http.https://github.com/.extraheader
           git push -u origin auto-pr-${{ github.sha }}
-          gh pr create --title "docker-odoo-01-base updated" --body "bot updated from https://github.com/ganarganar/docker-odoo-01-base/" --head bot-pr-${{ steps.current-time.outputs.formattedTime }}
+          gh pr create --title "docker-odoo-01-base updated" --body "bot updated" --head bot-pr-${{ steps.current-time.outputs.formattedTime }}
