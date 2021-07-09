@@ -113,3 +113,4 @@ jobs:
           git commit -am "updated Dockerfile"
           git push -u origin bot-pr-${{ steps.current-time.outputs.formattedTime }}
           echo ${{ secrets.GH_TOKEN }} | gh auth login --with-token
+          gh pr create --title "docker-odoo-01-base updated" --body "bot updated" --head bot-pr-${{ steps.current-time.outputs.formattedTime }}
