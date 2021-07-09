@@ -99,6 +99,8 @@ jobs:
           git config --local user.name "Ganar Ganar Bot"
           git config --local user.email "ganarganarbot@gmail.com"
           git checkout -b bot-pr-${{ steps.current-time.outputs.formattedTime }}
+          git config --unset-all http.https://github.com/.extraheader ; echo prevent Error: Process completed with exit code 5.
+        continue-on-error: true
 
       - name: Updated Dockerfile
         run: |
@@ -109,7 +111,5 @@ jobs:
         run: |
           cd docker-odoo-02-odoo
           git commit -am "updated Dockerfile"
-          git config --unset-all http.https://github.com/.extraheader ; echo prevent Error: Process completed with exit code 5.
-
           git push -u origin bot-pr-${{ steps.current-time.outputs.formattedTime }}
           echo ${{ secrets.GH_TOKEN }} | gh auth login --with-token
