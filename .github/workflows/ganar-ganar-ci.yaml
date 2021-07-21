@@ -5,9 +5,6 @@ on:
   push:
     branches:
       - main
-  schedule:
-    # See https://crontab.guru/weekly
-    - cron: 0 0 * * 0
 
 jobs:
   pre-commit:
@@ -38,7 +35,7 @@ jobs:
           - "13.0"
     env:
       # Indicates what's the equivalent to ganarganar/docker-odoo-01-base:latest image
-      LATEST_RELEASE: "14.0"
+      LATEST_RELEASE: "13.0"
       # Variables found by default in Docker Hub builder
       DOCKER_REPO: ganarganar/odoo-01-base
       DOCKER_TAG: ${{ matrix.odoo_version }}
